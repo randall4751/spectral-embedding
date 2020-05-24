@@ -1,0 +1,5 @@
+.idea
+venv
+*.ini
+*.vsdx
+__pycache__
