@@ -56,7 +56,7 @@ def compute_eigen_system(L):
     sorted_vectors = vectors[:, sorted_value_indexes]
     return sorted_vectors
 
-def get_embedding(A, dimensions):
+def create_embedding(A, k):
     #
     #   assert that adjacency matrix is symmetric (i.e. undirected graph)
     #
@@ -79,7 +79,7 @@ def get_embedding(A, dimensions):
     #
     #   sort the eigen values (ascending) and get the sorted indexes
     #
-    sorted_value_indexes = sorted(range(len(values)), key=lambda k: values[k])
+    sorted_value_indexes = sorted(range(len(values)), key=lambda i: values[i])
     #
     #   sort the eigen vectors according the ascending order of their associated values
     #
@@ -90,7 +90,7 @@ def get_embedding(A, dimensions):
     #   and embedding of dimension 4, select columns 1, 2, 3, and 4 from the sorted
     #   eigenvector matrix
     #
-    embedding = vectors[:, sorted_value_indexes[1:dimensions+1]]
+    embedding = vectors[:, sorted_value_indexes[1:k+1]]
     #
     #   the embedding for node j is embedding[j], i.e. the jth element from each
     #   eigenvector in the embedding matrix
@@ -133,9 +133,12 @@ def number_of_triangles(A):
 if __name__ == '__main__':
     import sys
 
-    A = read_edge_list('graph-edge-list-1.txt')
+    A = read_edge_list('graphs/simple-8-node-graph-edge-list.txt')
     assert is_simple_graph(A)
-
+    A_3 = np.dot(np.dot(A,A),A)
+    print(A_3)
+    sys.exit()
+    
     D = np.diag(np.sum(A, axis=0))
     print(D)
     #
@@ -151,7 +154,8 @@ if __name__ == '__main__':
     print(A_3)
     print(f'number of triangles: {number_of_triangles(A)}')
     sys.exit()
-    embedding = get_embedding(A,2)
+
+    embedding = create_embedding(A,2)
 
     print(partition_graph(embedding))
     # print(group_B)
