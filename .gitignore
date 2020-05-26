@@ -3,4 +3,5 @@ venv
 *.ini
 *.vsdx
 *.~vsdx
+.ipynb_checkpoints
 __pycache__
