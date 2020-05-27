@@ -1,16 +1,16 @@
 import numpy as np
 
-def compute_laplacian(A):
-    D = np.diag(np.sum(A, axis=0))
-    L = D - A
-    return L
-
-def create_embedding(A, k):
+def create_embedding(A, k=None):
     #
     #   assert that adjacency matrix is symmetric (i.e. undirected graph) and
     #   no self-loops
     #
     assert np.all(A == A.T) and np.all(np.diagonal(A) == 0)
+    #
+    #   if no embedding dimension is given, assume a complete embedding
+    #
+    if k is None:
+        k = A.shape[0]
     #
     #   compute diagonal degree matrix but summing along an axis
     #
@@ -53,7 +53,6 @@ def read_edge_list(filename):
         for line in f.readlines():
             n1,n2 = line[:-1].split(' ')
             edges.append((int(n1),int(n2)))
-    print(f'{len(edges)} edges')
     
     nodes = set()
     for edge in edges:
@@ -79,3 +78,24 @@ def partition_graph(embedding):
 def number_of_triangles(A):
     A_3 = np.dot(np.dot(A,A),A)
     return int(np.trace(A_3)/6)
+
+if __name__ == '__main__':
+    #
+    #   reference embedding for simple-8-node-graph
+    #
+    embedding_true = np.array([
+        [-0.37175704, -0.52629103, -0.52469872, -0.09364766,  0.35355339,  0.0293175,  -0.22333003],
+        [ 0.1820782,  -0.18943571, -0.27139624,  0.18357784, -0.35355339,  0.20061966,  0.73031271],
+        [ 0.53492517, -0.34130226,  0.40829325,  0.35631998,  0.35355339, -0.20775103, -0.10266466],
+        [ 0.38474139, -0.04361675,  0.05271512, -0.59756022, -0.35355339,  0.32312183, -0.36851978],
+        [ 0.00918132,  0.40298566, -0.3337428,   0.48875778, -0.35355339, -0.24921224, -0.41850101],
+        [-0.57600091, -0.1699332,   0.55242392, -0.0747754,  -0.35355339, -0.27452924,  0.05670809],
+        [-0.23858739,  0.41025503,  0.22882148,  0.18052378,  0.35355339,  0.66277222,  0.02348926],
+        [ 0.07541926,  0.45733826, -0.112416,   -0.4431961,   0.35355339, -0.48433869,  0.30250543]
+    ])
+
+    A = read_edge_list('graphs/simple-8-node-graph-edge-list.txt')
+    embedding = create_embedding(A)
+    assert np.allclose(embedding, embedding_true, rtol=1e-8, atol=1e-8)
+    
+    print("PASSED unit tests")
