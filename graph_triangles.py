@@ -1,5 +1,8 @@
 import numpy as np
 
+def compute_number_of_triangles(A):
+    return int(np.trace(np.dot(np.dot(A,A),A)))//6
+
 def compute_local_clustering_coefficients(A):
     '''
         The local clustering coefficient for a graph node C[i] is
@@ -22,11 +25,21 @@ def compute_local_clustering_coefficients(A):
     triangles = np.diagonal(A_3)
     return triangles/(neighbors*(neighbors-1))
 
-def compute_number_of_triangles(A):
-    return int(np.trace(np.dot(np.dot(A,A),A)))//6
+def compute_global_clustering_coefficient(A):
+    '''
+        The global clustering coefficient for a graph is defined as
+            C = 3*total_triangles/total_triplets
+    '''
+    n_triangles = compute_number_of_triangles(A)
+    k = np.sum(A, axis=0)                           # number of neighbors for each node
+    n_triplets = 0.5*np.sum(k*(k-1))                # total number of triplets
+    return 3.0*n_triangles/n_triplets
+
+def compute_average_clustering_coefficient(A):
+    return np.average(compute_local_clustering_coefficients(A))
 
 if __name__ == '__main__':
-    local_clustering_coefficients_true = np.array([
+    LOCAL_CLUSTERING_COEFFICIENTS_TRUE = np.array([
         0.00000000, 0.16666667, 1.00000000, 0.33333333, 0.33333333, 0.00000000, 0.33333333, 0.33333333
     ])
 
@@ -51,7 +64,13 @@ if __name__ == '__main__':
     number_of_triangles = compute_number_of_triangles(A)
     assert number_of_triangles == 2
 
-    local_cluster_coefficients = compute_local_clustering_coefficients(A)
-    assert np.allclose(local_cluster_coefficients, local_clustering_coefficients_true, rtol=1.0e-8, atol=1.0e-8)
+    local_clustering_coefficients = compute_local_clustering_coefficients(A)
+    assert np.allclose(local_clustering_coefficients, LOCAL_CLUSTERING_COEFFICIENTS_TRUE, rtol=1.0e-8, atol=1.0e-8)
+
+    global_clustering_coefficient = compute_global_clustering_coefficient(A)
+    assert global_clustering_coefficient == 0.2857142857142857
+    
+    average_clustering_coefficient = compute_average_clustering_coefficient(A)
+    assert average_clustering_coefficient == 0.3125
 
     print("PASSED all unit tests")
